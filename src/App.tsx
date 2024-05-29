@@ -1,51 +1,54 @@
-import { useEffect, useState } from "react";
-import type { Schema } from "../amplify/data/resource";
-import { generateClient } from "aws-amplify/data";
-import { Authenticator } from '@aws-amplify/ui-react';
+import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Hub } from 'aws-amplify/utils';
+
+import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css'
 import '@aws-amplify/ui-react/styles.css';
 
-const client = generateClient<Schema>();
+import SiteNav from './components/common/SiteNav';
+import LandingPage from './components/landing/LandingPage';
+import LoginPage from './components/auth/LoginPage';
+import RegisterPage from './components/auth/RegisterPage';
+import { AuthUser, getCurrentUser } from 'aws-amplify/auth';
 
 function App() {
-  const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+  const [user, setUser] = useState<AuthUser | null>(null);
+  
+  useEffect(() => {
+    Hub.listen('auth', (event) => {
+      const eventType = event.payload.event;
+      if (eventType === 'signedOut' || eventType === 'signedIn') {
+        updateUser();
+      }
+    })
+  }, [])
 
-  function deleteTodo(id: string) {
-    client.models.Todo.delete({ id })
+  const updateUser = async () => {
+    try {
+      const user = await getCurrentUser();
+      setUser(user);
+    } catch (err) {
+      setUser(null);
+    }
   }
 
   useEffect(() => {
-    client.models.Todo.observeQuery().subscribe({
-      next: (data) => setTodos([...data.items]),
-    });
-  }, []);
-
-  function createTodo() {
-    client.models.Todo.create({ content: window.prompt("Todo content") });
-  }
+    updateUser();
+  }, [])
 
   return (
-        
-    <Authenticator>
-      {({ signOut, user }) => (
-        <main>
-          <h1>{user?.signInDetails?.loginId}'s todos</h1>
-          <button onClick={createTodo}>+ new</button>
-          <ul>
-            {todos.map((todo) => (
-              <li key={todo.id} onClick={() => deleteTodo(todo.id)}>{todo.content}</li>
-            ))}
-          </ul>
-          <div>
-            🥳 App successfully hosted. Try creating a new todo.
-            <br />
-            <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
-              Review next step of this tutorial.
-            </a>
-          </div>
-          <button onClick={signOut}>Sign out</button>
-        </main>
-      )}
-    </Authenticator>
+    <Router>
+      <div>
+        <SiteNav user={user} />
+        <Routes>
+          <Route path='*' element={<LandingPage user={user} />} />
+          <Route path='/landing' element={<LandingPage user={user} />} />
+          <Route path='/login' element={<LoginPage />} />
+          <Route path='/register' element={<RegisterPage />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
