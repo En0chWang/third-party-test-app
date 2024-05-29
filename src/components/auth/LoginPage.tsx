@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { signIn, signOut } from 'aws-amplify/auth'; 
 import Container from 'react-bootstrap/Container';

@@ -13,7 +13,6 @@ const RegisterPage: React.FC = () => {
     const [username, setUserName] = useState('');
     const [password, setPassword] = useState('');
     const [email, setEmail] = useState('');
-    const [confirmSignUp, setConfirmSignUp] = useState(false);
 
     const handleRegister = async () => {
         try {
@@ -22,8 +21,7 @@ const RegisterPage: React.FC = () => {
             console.log(email)
 
             const data = await signUp({username, password})
-            console.log(data);  
-            setConfirmSignUp(true);
+            console.log(data);
         } catch (err) { console.log(err) }
     }
 
