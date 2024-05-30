@@ -32,7 +32,7 @@ const LoginPage = () => {
 
             if (amazonCallbackUri && amazonState) {
                 const landingUrl = encodeURIComponent(`https://${window.location.host}/landing`);
-                const redirectUrl = `${amazonCallbackUri}?redirect_uri=${landingUrl}&amazon_state=${amazonState}&state=3pstate`;
+                const redirectUrl = `${amazonCallbackUri}?redirect_uri=${landingUrl}&amazon_state=${amazonState}&state=3pstate&version=beta`;
         
                 console.log("After login redirect URL: " + redirectUrl);
                 
