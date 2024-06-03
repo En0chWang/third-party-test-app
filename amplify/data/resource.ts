@@ -3,10 +3,12 @@ import { myApiFunction } from '../functions/api-function/resource';
 
 const schema = a.schema({
   Token: a.model({
-      user_id: a.string(),
-      mcid: a.string(),
+      user_id: a.id().required(),
+      mcid: a.string().required(),
       refresh_token: a.string(),
-  }).authorization(allow => [allow.owner()])
+  })
+  .identifier(['user_id', 'mcid'])
+  .authorization(allow => [allow.owner()])
 }).authorization(allow => [
   allow.resource(myApiFunction).to(['mutate', 'query'])
 ]);
