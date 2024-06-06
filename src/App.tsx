@@ -10,6 +10,7 @@ import SiteNav from './components/common/SiteNav';
 import LandingPage from './components/landing/LandingPage';
 import LoginPage from './components/auth/LoginPage';
 import RegisterPage from './components/auth/RegisterPage';
+import MerchantWidgetPage from './components/widget/MerchantWidgetPage';
 import { AuthUser, getCurrentUser } from 'aws-amplify/auth';
 
 function App() {
@@ -42,8 +43,9 @@ function App() {
       <div>
         <SiteNav user={user} />
         <Routes>
-          <Route path='*' element={<LandingPage user={user} />} />
-          <Route path='/landing' element={<LandingPage user={user} />} />
+          <Route path='*' element={<LandingPage user={user}/>} />
+          <Route path='/landing' element={<LandingPage user={user}/>} />
+          <Route path='/merchants' element={<MerchantWidgetPage />} />
           <Route path='/login' element={<LoginPage />} />
           <Route path='/register' element={<RegisterPage />} />
         </Routes>

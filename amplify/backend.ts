@@ -10,11 +10,9 @@ import {
 import { Policy, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { myApiFunction } from "./functions/api-function/resource";
 import { auth } from './auth/resource';
-import { data } from './data/resource';
 
 const backend = defineBackend({
   auth,
-  data,
   myApiFunction,
 });
 
@@ -43,9 +41,9 @@ const cognitoAuth = new CognitoUserPoolsAuthorizer(apiStack, "CognitoAuth", {
 });
 
 // create a new resource path with Cognito authorization
-const spapiPath = myRestApi.root.addResource("sp-api-path");
+const merchantsPath = myRestApi.root.addResource("merchants-path");
 
-spapiPath.addMethod("GET", lambdaIntegration, {
+merchantsPath.addMethod("GET", lambdaIntegration, {
   authorizationType: AuthorizationType.COGNITO,
   authorizer: cognitoAuth,
 });
@@ -65,7 +63,7 @@ const apiRestPolicy = new Policy(apiStack, "RestApiPolicy", {
       actions: ["execute-api:Invoke"],
       resources: [
         `${myRestApi.arnForExecuteApi("auth-code-path")}`,
-        `${myRestApi.arnForExecuteApi("sp-api-path")}`,
+        `${myRestApi.arnForExecuteApi("merchants-path")}`,
       ],
     }),
   ],

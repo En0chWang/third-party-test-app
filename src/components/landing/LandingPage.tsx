@@ -1,33 +1,83 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
-import { useLocation } from 'react-router-dom';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
-import { AuthUser } from 'aws-amplify/auth';
+import Alert from 'react-bootstrap/Alert';
+import { AuthUser, fetchAuthSession, getCurrentUser } from 'aws-amplify/auth';
+import { post } from 'aws-amplify/api';
 
 interface LandingPageProps {
     user: AuthUser | null;
 }
 
+interface AuthCodeData {
+    message?: string;
+    error?: string;
+}
+
 const LandingPage: React.FC<LandingPageProps> = (props) => {
+    const [apiData, setApiData] = useState<AuthCodeData | null>(null);
+    const [isLinkingNeeded, setIsLinkingNeeded] = useState(false);
     const location = useLocation();
 
-    const queryParams = new URLSearchParams(location.search);
-    console.log(queryParams);
+    useEffect(() => {
+        const getItem = async () => {
+            try {
+                console.log('getting token');
+        
+                const session = await fetchAuthSession();
+                const token = session.tokens?.idToken?.toString() ?? '';
 
-    const stateToken = queryParams.get('SAMPLE_APP_STATE_TOKEN')
-	const spdsAuthCode = queryParams.get('SPDS_AUTH_CODE')
+                const currentUser = await getCurrentUser();
+                const user_id = currentUser.userId;
 
-    console.log("Retrieved state token: " + stateToken);
-    console.log("Retrieved authorization code: " + spdsAuthCode);
+                const queryParams = new URLSearchParams(location.search);
+                console.log(queryParams);
+
+                const mcid = queryParams.get('selling_partner_id') ?? '';
+	            const spdsAuthCode = queryParams.get('spapi_oauth_code') ?? '';
+
+                console.log("Retrieved sp id: " + mcid);
+                console.log("Retrieved authorization code: " + spdsAuthCode);
+                if (mcid === '' || spdsAuthCode === '') {
+                    return;
+                }
+                setIsLinkingNeeded(true);
+                const restOperation = post({ 
+                    apiName: 'myRestApi',
+                    path: 'auth-code-path',
+                    options: {
+                        headers: {
+                            'Authorization': token
+                        },
+                        queryParams: {
+                            'spapi_oauth_code': spdsAuthCode,
+                            'mcid': mcid,
+                            'user_id': user_id,
+                        }
+                    }
+                });
+                const { body } = await restOperation.response;
+                const str = await body.text();
+                console.log(JSON.parse(str));
+                setApiData(JSON.parse(str));
+            } catch (error) {
+                console.log(error)
+                setApiData(null);
+            }
+        };
+        console.log(props.user);
+        console.log("calling getItem()");
+        
+        getItem();
+    }, [location])
 
     return (
         <Container>
             <Row className="px-4 my-5">
                 <Col sm={5}>
-                    
                     {
                         !props.user && (
                             <>
@@ -45,11 +95,36 @@ const LandingPage: React.FC<LandingPageProps> = (props) => {
                     }
                     {
                         props.user && (
-                            <p className="font-weight-light">Hello {props.user.signInDetails?.loginId}</p>
+                            <>
+                                <p className="font-weight-light">Hello {props.user.signInDetails?.loginId}</p>
+                            </>
                         )
                     }
                 </Col>
             </Row>
+            {(apiData && isLinkingNeeded && apiData.error && apiData.error !== '') && 
+            (
+            <Row className="px-4 my-5">
+                <Alert variant="danger" dismissible>
+                    <Alert.Heading>Oh snap! Authorization Failed</Alert.Heading>
+                    <p>
+                        {apiData.error}
+                    </p>
+                </Alert>
+            </Row>)}
+
+            {(apiData && isLinkingNeeded && apiData.message && apiData.message !== '') && 
+            (
+            <Row className="px-4 my-5">
+                <Alert variant="success">
+                    <Alert.Heading>Authorization Succeeded</Alert.Heading>
+                    <p>
+                        {apiData.message}
+                    </p>
+                </Alert>
+            </Row>)}
+
+
         </Container>
     )
 }
