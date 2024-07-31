@@ -13,15 +13,8 @@ interface LandingPageProps {
 }
 
 interface AuthCodeData {
-    message?: LWAData;
+    message?: string;
     error?: string;
-}
-
-interface LWAData {
-    access_token: string;
-    expires_in: number;
-    refresh_token: string;
-    token_type: string;
 }
 
 const LandingPage: React.FC<LandingPageProps> = (props) => {
@@ -126,16 +119,7 @@ const LandingPage: React.FC<LandingPageProps> = (props) => {
                 <Alert variant="success">
                     <Alert.Heading>Authorization Succeeded</Alert.Heading>
                     <p>
-                        Access Token: {apiData.message.access_token}
-                    </p>
-                    <p>
-                        Expires in: {apiData.message.expires_in}
-                    </p>
-                    <p>
-                        Refresh Token: {apiData.message.refresh_token}
-                    </p>
-                    <p>
-                        Token Type: {apiData.message.token_type}
+                        {apiData.message}
                     </p>
                 </Alert>
             </Row>)}
