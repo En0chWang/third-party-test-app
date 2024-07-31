@@ -44,7 +44,7 @@ const handleAuthCode = async (lwa_auth_code: string) => {
             "Access-Control-Allow-Headers": "*", // Specify only the headers you need to allow
             "Access-Control-Allow-Methods": "*",
           },
-          body: JSON.stringify(response.data)
+          body: JSON.stringify({message: response.data})
         }; 
         
     } catch (err) {
