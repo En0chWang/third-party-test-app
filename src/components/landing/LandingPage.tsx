@@ -18,10 +18,10 @@ interface AuthCodeData {
 }
 
 interface LWAData {
-    access_token: string,
-    expires_in: number,
-    refresh_token: string,
-    token_type: string,
+    access_token: string;
+    expires_in: number;
+    refresh_token: string;
+    token_type: string;
 }
 
 const LandingPage: React.FC<LandingPageProps> = (props) => {
