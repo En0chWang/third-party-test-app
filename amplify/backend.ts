@@ -9,11 +9,13 @@ import {
 } from "aws-cdk-lib/aws-apigateway";
 import { Policy, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { myApiFunction } from "./functions/api-function/resource";
+import { lwaFunction } from "./functions/lwa/resource";
 import { auth } from './auth/resource';
 
 const backend = defineBackend({
   auth,
   myApiFunction,
+  lwaFunction,
 });
 
 // create a new API stack
@@ -33,6 +35,10 @@ const myRestApi = new RestApi(apiStack, "RestApi", {
 // create a new Lambda integration
 const lambdaIntegration = new LambdaIntegration(
   backend.myApiFunction.resources.lambda
+);
+
+const lwaLambdaIntegration = new LambdaIntegration(
+  backend.lwaFunction.resources.lambda
 );
 
 // create a new Cognito User Pools authorizer
@@ -56,6 +62,14 @@ authCodePath.addMethod("POST", lambdaIntegration, {
   authorizer: cognitoAuth,
 })
 
+// save refreshToken path
+const lwaPath = myRestApi.root.addResource("lwa-path");
+
+lwaPath.addMethod("POST", lwaLambdaIntegration, {
+  authorizationType: AuthorizationType.COGNITO,
+  authorizer: cognitoAuth,
+})
+
 // create a new IAM policy to allow Invoke access to the API
 const apiRestPolicy = new Policy(apiStack, "RestApiPolicy", {
   statements: [
@@ -64,6 +78,7 @@ const apiRestPolicy = new Policy(apiStack, "RestApiPolicy", {
       resources: [
         `${myRestApi.arnForExecuteApi("auth-code-path")}`,
         `${myRestApi.arnForExecuteApi("merchants-path")}`,
+        `${myRestApi.arnForExecuteApi("lwa-path")}`,
       ],
     }),
   ],

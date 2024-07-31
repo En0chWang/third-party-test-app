@@ -12,6 +12,7 @@ import LoginPage from './components/auth/LoginPage';
 import RegisterPage from './components/auth/RegisterPage';
 import MerchantWidgetPage from './components/widget/MerchantWidgetPage';
 import { AuthUser, getCurrentUser } from 'aws-amplify/auth';
+import LWAPage from './components/lwa/LWAPage';
 
 function App() {
   const [user, setUser] = useState<AuthUser | null>(null);
@@ -45,6 +46,7 @@ function App() {
         <Routes>
           <Route path='*' element={<LandingPage user={user}/>} />
           <Route path='/landing' element={<LandingPage user={user}/>} />
+          <Route path='/lwa' element={<LWAPage user={user}/>} />
           <Route path='/merchants' element={<MerchantWidgetPage />} />
           <Route path='/login' element={<LoginPage />} />
           <Route path='/register' element={<RegisterPage />} />
