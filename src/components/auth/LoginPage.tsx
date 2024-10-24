@@ -24,15 +24,24 @@ const LoginPage = () => {
             console.log(user);
 
             const queryParams = new URLSearchParams(location.search);
-            console.log(queryParams);
-            const amazonCallbackUri = queryParams.get('amazon_callback_uri')
-            const amazonState = queryParams.get('amazon_state')
-            console.log("amazon callback: " + amazonCallbackUri)
-            console.log("amazon state: " + amazonState)
+            console.log(queryParams)
+            const amazon_callback_uri = queryParams.get('amazon_callback_uri')
+            const amazon_state = queryParams.get('amazon_state')
 
-            if (amazonCallbackUri && amazonState) {
-                const landingUrl = encodeURIComponent(`https://${window.location.host}/landing`);
-                const redirectUrl = `${amazonCallbackUri}?redirect_uri=${landingUrl}&amazon_state=${amazonState}&state=3pstate`;
+            // Needs for SSO 
+            const amazonReturnURI = queryParams.get('amazonReturnURI'); // intermediary consent page
+    
+            const thirdPartyState = '3pstate';
+            const thirdPartyReturnURI = encodeURIComponent(`https://${window.location.host}/landing`); // 3p landing page
+
+
+            if (amazonReturnURI) {
+                const redirectUrl = `${amazonReturnURI}&thirdPartyState=${thirdPartyState}&thirdPartyReturnURI=${thirdPartyReturnURI}`;
+                console.log("After login redirect URL: " + redirectUrl);
+                
+                window.location.href = redirectUrl
+            } else if (amazon_callback_uri && amazon_state) {
+                const redirectUrl = `${amazon_callback_uri}?redirect_uri=${thirdPartyReturnURI}&amazon_state=${amazon_state}&state=3pstate`;
         
                 console.log("After login redirect URL: " + redirectUrl);
                 
