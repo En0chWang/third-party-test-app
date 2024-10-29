@@ -39,6 +39,17 @@ const LandingPage: React.FC<LandingPageProps> = (props) => {
                 const mcid = queryParams.get('selling_partner_id') ?? '';
 	            const spdsAuthCode = queryParams.get('spapi_oauth_code') ?? '';
 
+                const state = queryParams.get('state');
+                if (state) {
+                    const decodedState = decodeURIComponent(state);
+                    const stateParams = new URLSearchParams(decodedState);
+                    const finalAmazonRedirectURI = stateParams.get('finalAmazonRedirectURI');
+                    if (finalAmazonRedirectURI) {
+                        window.location.href = finalAmazonRedirectURI;
+                    }
+                    return;
+                }
+
                 console.log("Retrieved sp id: " + mcid);
                 console.log("Retrieved authorization code: " + spdsAuthCode);
                 if (mcid === '' || spdsAuthCode === '') {
