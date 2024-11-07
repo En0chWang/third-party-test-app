@@ -4,7 +4,6 @@ import { Container, Row, Col, Table, Spinner } from 'react-bootstrap';
 // import { fetchAuthSession, getCurrentUser } from 'aws-amplify/auth';
 // import { get } from 'aws-amplify/api';
 import { EmbeddedAppSDK } from '@amzn/seller-central-embedded-app-sdk';
-import { AuthResponseMessage } from '@amzn/seller-central-embedded-app-sdk-models'
 
 interface MerchantItem {
     mcid: string;
