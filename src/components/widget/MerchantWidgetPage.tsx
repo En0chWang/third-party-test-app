@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Container, Row, Col, Table, Spinner } from 'react-bootstrap';
-import { fetchAuthSession, getCurrentUser } from 'aws-amplify/auth';
-import { get } from 'aws-amplify/api';
+// import { fetchAuthSession, getCurrentUser } from 'aws-amplify/auth';
+// import { get } from 'aws-amplify/api';
 import { EmbeddedAppSDK } from '@amzn/seller-central-embedded-app-sdk';
 import { AuthResponseMessage } from '@amzn/seller-central-embedded-app-sdk-models'
 
@@ -23,51 +23,36 @@ const MerchantWidgetPage: React.FC = () => {
 
     useEffect(() => {
         const getMerchants = async ()=> {
-            const session = await fetchAuthSession();
-            const token = session.tokens?.idToken?.toString() ?? '';
+
+            // const session = await fetchAuthSession();
+            // const token = session.tokens?.idToken?.toString() ?? '';
     
-            const currentUser = await getCurrentUser();
-            const user_id = currentUser.userId;
+            // const currentUser = await getCurrentUser();
+            // const user_id = currentUser.userId;
 
             const embeddedAppSDK: EmbeddedAppSDK = EmbeddedAppSDK.getInstance();
 
             try {
-                embeddedAppSDK.initialize();
-                console.log("==== [3P] Embedded App SDK initialized successfully");
-                console.log("==== [3P] Fetching auth code now");
-              
-                const myType: Promise<AuthResponseMessage> = embeddedAppSDK.getInstance();
-                myType.then(async (authCode) => {
-                  console.log('Authenticated user token value: ', authCode);
-                  if (authCode) {
-                    console.log('auth code is not null: ', authCode);
-                    try {
-                        const restOperation = get({ 
-                            apiName: 'myRestApi',
-                            path: 'merchants-path',
-                            options: {
-                                headers: {
-                                    'Authorization': token
-                                },
-                                queryParams: {
-                                    'user_id': user_id,
-                                }
-                            }
+                // Initialize the Embedded App SDK
+                embeddedAppSDK.initialize().then(() => {
+                    console.log("[3P] Embedded App SDK initialized successfully");
+
+                    embeddedAppSDK.authorizationModule.getAuthCode().then(authCode => {
+                        console.log('[3P]Authenticated user token value:', authCode);
+
+                        setApiData({
+                            'message': [
+                                {'mcid': authCode?.value ?? '', 'updated_time': 123}
+                            ],
+                            'error': ''
                         });
-                        const { body } = await restOperation.response;
-                        const str = await body.text();
-                        // console.log(JSON.parse(str));
                         setLoading(false);
-                        setApiData(JSON.parse(str));
-                    } catch (error) {
-                        console.log(error);
-                        setLoading(false);
-                        setApiData({message: [], error: 'There is something wrong with Widget'});
-                    }
-                  }
-                  
-                }).catch((error: Error) => {
-                  console.error('==== [3P] Error retrieving auth token:', error);
+                      }).catch(error => {
+                        console.error('[3P]Error retrieving auth token:', error);
+                    });
+
+                 }).catch(error => {
+                    console.error("[3P] Error during Embedded App SDK initialization:", error);
                 });
             } catch (error) {
                 console.error("==== [3P] Error during Embedded App SDK initialization:", error);
