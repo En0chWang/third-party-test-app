@@ -4,6 +4,7 @@ import { Container, Row, Col, Table, Spinner } from 'react-bootstrap';
 // import { fetchAuthSession, getCurrentUser } from 'aws-amplify/auth';
 // import { get } from 'aws-amplify/api';
 import { EmbeddedAppSDK } from '@amzn/seller-central-embedded-app-sdk';
+import { Metrics, Log, MetricType, LogType } from '@amzn/seller-central-embedded-app-sdk-models';
 
 interface MerchantItem {
     mcid: string;
@@ -39,6 +40,26 @@ const MerchantWidgetPage: React.FC = () => {
                     embeddedAppSDK.authorizationModule.getAuthCode().then(authCode => {
                         console.log('[3P]Authenticated user token value:', authCode);
 
+                        // Capture custom metrics and logs
+                        const metricsToRecord: Metrics = {
+                            metricName: "WidgetLoadSuccess",
+                            metricsType: MetricType.SUCCESS,
+                            timestamp: Date.now(),
+                            value: 1,
+                            isRetryable: true
+                        };
+
+                        embeddedAppSDK.telemetryModule.captureMetrics(metricsToRecord);
+
+                        const logToRecord: Log = {
+                            logType: LogType.INFO,
+                            message: "Capturing some custom error log for widget load",
+                            timestamp: Date.now(),
+                            isRetryable: true
+                        };
+                        embeddedAppSDK.telemetryModule.captureLog(logToRecord);
+                        embeddedAppSDK.telemetryModule.captureTelemetry({'metrics':metricsToRecord, 'log': logToRecord});
+
                         setApiData({
                             'message': [
                                 {'mcid': authCode?.value ?? '', 'updated_time': 123}
@@ -46,7 +67,7 @@ const MerchantWidgetPage: React.FC = () => {
                             'error': ''
                         });
                         setLoading(false);
-                      }).catch(error => {
+                    }).catch(error => {
                         console.error('[3P]Error retrieving auth token:', error);
                     });
 
