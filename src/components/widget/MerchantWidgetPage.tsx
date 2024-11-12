@@ -3,8 +3,8 @@ import { useLocation } from 'react-router-dom';
 import { Container, Row, Col, Table, Spinner } from 'react-bootstrap';
 // import { fetchAuthSession, getCurrentUser } from 'aws-amplify/auth';
 // import { get } from 'aws-amplify/api';
-import { EmbeddedAppSDK } from '@amzn/seller-central-embedded-app-sdk';
-import { Metrics, Log, MetricType, LogType } from '@amzn/seller-central-embedded-app-sdk-models';
+// import { EmbeddedAppSDK } from '@amzn/seller-central-embedded-app-sdk';
+// import { Metrics, Log, MetricType, LogType, MetricNameConstants } from '@amzn/seller-central-embedded-app-sdk-models';
 
 interface MerchantItem {
     mcid: string;
@@ -21,72 +21,72 @@ const MerchantWidgetPage: React.FC = () => {
 
     const location = useLocation();
 
-    useEffect(() => {
-        const getMerchants = async ()=> {
+    // useEffect(() => {
+    //     const getMerchants = async ()=> {
 
-            // const session = await fetchAuthSession();
-            // const token = session.tokens?.idToken?.toString() ?? '';
+    //         // const session = await fetchAuthSession();
+    //         // const token = session.tokens?.idToken?.toString() ?? '';
     
-            // const currentUser = await getCurrentUser();
-            // const user_id = currentUser.userId;
+    //         // const currentUser = await getCurrentUser();
+    //         // const user_id = currentUser.userId;
 
-            const embeddedAppSDK: EmbeddedAppSDK = EmbeddedAppSDK.getInstance();
+    //         const embeddedAppSDK: EmbeddedAppSDK = EmbeddedAppSDK.getInstance();
 
-            try {
-                // Initialize the Embedded App SDK
-                embeddedAppSDK.initialize().then(() => {
-                    console.log("[3P] Embedded App SDK initialized successfully");
+    //         try {
+    //             // Initialize the Embedded App SDK
+    //             embeddedAppSDK.initialize().then(() => {
+    //                 console.log("[3P] Embedded App SDK initialized successfully");
 
-                    embeddedAppSDK.authorizationModule.getAuthCode().then(authCode => {
-                        console.log('[3P]Authenticated user token value:', authCode);
+    //                 embeddedAppSDK.authorizationModule.getAuthCode().then(authCode => {
+    //                     console.log('[3P]Authenticated user token value:', authCode);
 
-                        // Capture custom metrics and logs
-                        const metricsToRecord: Metrics = {
-                            metricName: "WidgetLoadSuccess",
-                            metricsType: MetricType.SUCCESS,
-                            timestamp: Date.now(),
-                            value: 1,
-                            isRetryable: true
-                        };
+    //                     // Capture custom metrics and logs
+    //                     const metricsToRecord: Metrics = {
+    //                         metricName: MetricNameConstants.WIDGET_LOAD,
+    //                         metricsType: MetricType.SUCCESS,
+    //                         timestamp: Date.now(),
+    //                         value: 1,
+    //                         isRetryable: true
+    //                     };
 
-                        embeddedAppSDK.telemetryModule.captureMetrics(metricsToRecord);
+    //                     embeddedAppSDK.telemetryModule.captureMetrics(metricsToRecord);
 
-                        const logToRecord: Log = {
-                            logType: LogType.INFO,
-                            message: "Capturing some custom error log for widget load",
-                            timestamp: Date.now(),
-                            isRetryable: true
-                        };
-                        embeddedAppSDK.telemetryModule.captureLog(logToRecord);
-                        embeddedAppSDK.telemetryModule.captureTelemetry({'metrics':metricsToRecord, 'log': logToRecord});
+    //                     const logToRecord: Log = {
+    //                         logType: LogType.INFO,
+    //                         message: "Capturing some custom error log for widget load",
+    //                         timestamp: Date.now(),
+    //                         isRetryable: true
+    //                     };
+    //                     embeddedAppSDK.telemetryModule.captureLog(logToRecord);
+    //                     embeddedAppSDK.telemetryModule.captureTelemetry({'metrics':metricsToRecord, 'log': logToRecord});
 
-                        setApiData({
-                            'message': [
-                                {'mcid': authCode?.value ?? '', 'updated_time': 123}
-                            ],
-                            'error': ''
-                        });
-                        setLoading(false);
-                    }).catch(error => {
-                        console.error('[3P]Error retrieving auth token:', error);
-                    });
+    //                     setApiData({
+    //                         'message': [
+    //                             {'mcid': authCode?.value ?? '', 'updated_time': Date.now()}
+    //                         ],
+    //                         'error': ''
+    //                     });
+    //                     setLoading(false);
+    //                 }).catch(error => {
+    //                     console.error('[3P]Error retrieving auth token:', error);
+    //                 });
 
-                 }).catch(error => {
-                    console.error("[3P] Error during Embedded App SDK initialization:", error);
-                });
-            } catch (error) {
-                console.error("==== [3P] Error during Embedded App SDK initialization:", error);
-            }
-        };
-        getMerchants();
-    }, [location]);
+    //              }).catch(error => {
+    //                 console.error("[3P] Error during Embedded App SDK initialization:", error);
+    //             });
+    //         } catch (error) {
+    //             console.error("==== [3P] Error during Embedded App SDK initialization:", error);
+    //         }
+    //     };
+    //     getMerchants();
+    // }, [location]);
 
 
     return (
         <Container className="justify-content-center align-items-center">
             <Row className="justify-content-md-center mt-5">
                 <Col className="d-flex align-items-center justify-content-center">
-                    <h1 className="text-center">Amazon Merchant Management Widget</h1>
+                    <h1 className="text-center">Amazon User Linking Widget</h1>
                 </Col>
             </Row>
             <Row className="mt-5">
@@ -105,7 +105,7 @@ const MerchantWidgetPage: React.FC = () => {
                         <Table responsive bordered className="text-center">
                             <thead>
                             <tr>
-                                <th>Amazon Merchant ID</th>
+                                <th>Amazon SSO Auth Code</th>
                                 <th>Last Updated</th>
                             </tr>
                             </thead>
