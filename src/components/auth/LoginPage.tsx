@@ -53,7 +53,7 @@ const LoginPage = () => {
             }
         } catch (err) { 
             console.log(err);
-            setLoginError('Invaid Username or password'); // Set the error message
+            setLoginError('Invalid username or password'); // Set the error message
         }
     }
 
