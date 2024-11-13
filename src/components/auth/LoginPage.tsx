@@ -53,7 +53,7 @@ const LoginPage = () => {
             }
         } catch (err) { 
             console.log(err);
-            setLoginError(err.message); // Set the error message
+            setLoginError('Invaid Username or password'); // Set the error message
         }
     }
 
