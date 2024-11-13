@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { signIn, signOut } from 'aws-amplify/auth'; 
 import Container from 'react-bootstrap/Container';
+import Alert from 'react-bootstrap/Alert';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
@@ -13,12 +14,14 @@ const LoginPage = () => {
 
     const [username, setUserName] = useState('');
     const [password, setPassword] = useState('');
+    const [loginError, setLoginError] = useState('');
 
     const handleLogin = async () => {
         try {
             console.log('Login');
             console.log(username);
             console.log(password);
+            setLoginError('');
             await signOut();
             const user = await signIn({username, password});
             console.log(user);
@@ -34,7 +37,6 @@ const LoginPage = () => {
             const thirdPartyState = '3pstate';
             const thirdPartyReturnURI = encodeURIComponent(`https://${window.location.host}/landing`); // 3p landing page
 
-
             if (amazonReturnURI) {
                 const redirectUrl = `${amazonReturnURI}&thirdPartyState=${thirdPartyState}&thirdPartyReturnURI=${thirdPartyReturnURI}`;
                 console.log("After login redirect URL: " + redirectUrl);
@@ -49,11 +51,40 @@ const LoginPage = () => {
             } else {
                 navigate('/landing')
             }
-        } catch (err) { console.log(err) }
+        } catch (err) { 
+            console.log(err);
+            setLoginError(err.message); // Set the error message
+        }
+    }
+
+    const handleCancel = () => {
+
+        const queryParams = new URLSearchParams(location.search);
+        console.log(queryParams)
+        const amazonReturnURI = queryParams.get('amazonReturnURI');
+        if (amazonReturnURI) {
+            const decodedUrl = decodeURIComponent(amazonReturnURI);
+            const params = new URLSearchParams(decodedUrl);
+            const finalAmazonRedirectURI = params.get('finalAmazonRedirectURI');
+            if (finalAmazonRedirectURI) {
+                window.location.href = `${finalAmazonRedirectURI}&3pLoginStatus=incomplete`
+            }
+            return;
+        }
     }
 
     return (
         <Container>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <Row className="justify-content-md-center">
+                <Col md="auto">
+                    { loginError && (
+                        <Alert variant="danger">
+                            {loginError}
+                        </Alert>
+                    )}
+                </Col>
+            </Row>
             &nbsp;&nbsp;&nbsp;&nbsp;
             <Row className="justify-content-md-center">
                 <Col md="auto"><h1>Login</h1></Col>
@@ -84,7 +115,8 @@ const LoginPage = () => {
                         &nbsp;&nbsp;
                         <Link
                             to='/'>
-                            <Button variant="outline-primary">Cancel</Button>
+                            <Button variant="outline-primary" onClick={handleCancel}>
+                                Cancel</Button>
                         </Link>
                     </Form>
                 </Col>
