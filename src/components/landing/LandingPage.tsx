@@ -44,7 +44,7 @@ const LandingPage: React.FC<LandingPageProps> = (props) => {
 		    // First decode the state parameter
 		    const decodedState = decodeURIComponent(state);
 		    
-		    // The state parameter starts with '3pstate' directly, no need for URLSearchParams
+		    // The state parameter starts with '3pstate' directly
 		    const finalAmazonRedirectURI = decodedState.replace('3pstate', '');
 		    
 		    if (finalAmazonRedirectURI) {
