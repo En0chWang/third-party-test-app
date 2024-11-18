@@ -24,7 +24,7 @@ const SiteNav: React.FC<SiteNavProps> = (props) => {
         <header>
             <Navbar bg="dark" expand="lg" variant="dark">
                 <Container>    
-                   <Navbar.Brand><Nav.Link href="/">Test App</Nav.Link></Navbar.Brand>
+                   <Navbar.Brand><Nav.Link href="/">3P Test App</Nav.Link></Navbar.Brand>
                     <Navbar.Toggle aria-controls="basic-navbar-nav" />
                     <Navbar.Collapse id="basic-navbar-nav">
                         {
