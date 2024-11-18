@@ -69,7 +69,7 @@ const LoginPage = () => {
             const params = new URLSearchParams(decodedUrl);
             const finalAmazonRedirectURI = params.get('finalAmazonRedirectURI');
             if (finalAmazonRedirectURI) {
-                window.location.href = `${finalAmazonRedirectURI}&authErrorType=incomplete`
+                window.location.href = `${finalAmazonRedirectURI}&errorType=incomplete`
             }
             return;
         }
