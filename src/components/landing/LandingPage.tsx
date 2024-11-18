@@ -43,7 +43,9 @@ const LandingPage: React.FC<LandingPageProps> = (props) => {
                 if (state) {
                     const decodedState = decodeURIComponent(state);
                     const stateParams = new URLSearchParams(decodedState);
-                    const finalAmazonRedirectURI = stateParams.get('finalAmazonRedirectURI');
+		    const thirdPartyState = stateParams.get('thirdPartyState');
+	            const decodedState = decodeURIComponent(thirdPartyState);
+	            const finalAmazonRedirectURI = decodedState.replace('3pstate', '');
                     if (finalAmazonRedirectURI) {
                         window.location.href = `${finalAmazonRedirectURI}&authCode=123`
                     }
