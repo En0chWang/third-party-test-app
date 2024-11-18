@@ -39,18 +39,19 @@ const LandingPage: React.FC<LandingPageProps> = (props) => {
                 const mcid = queryParams.get('selling_partner_id') ?? '';
 	            const spdsAuthCode = queryParams.get('spapi_oauth_code') ?? '';
 
-                const state = queryParams.get('state');
-                if (state) {
-                    const decodedState = decodeURIComponent(state);
-                    const stateParams = new URLSearchParams(decodedState);
-		    const thirdPartyState = stateParams.get('thirdPartyState');
-	            const decodedThirdPartyState = decodeURIComponent(thirdPartyState);
-	            const finalAmazonRedirectURI = decodedThirdPartyState.replace('3pstate', '');
-                    if (finalAmazonRedirectURI) {
-                        window.location.href = `${finalAmazonRedirectURI}&authCode=123`
-                    }
-                    return;
-                }
+		const state = queryParams.get('state');
+		if (state) {
+		    // First decode the state parameter
+		    const decodedState = decodeURIComponent(state);
+		    
+		    // The state parameter starts with '3pstate' directly, no need for URLSearchParams
+		    const finalAmazonRedirectURI = decodedState.replace('3pstate', '');
+		    
+		    if (finalAmazonRedirectURI) {
+		        window.location.href = `${finalAmazonRedirectURI}&authCode=123`;
+		    }
+		    return;
+		}
 
                 console.log("Retrieved sp id: " + mcid);
                 console.log("Retrieved authorization code: " + spdsAuthCode);
