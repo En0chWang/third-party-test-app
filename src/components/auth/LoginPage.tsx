@@ -33,12 +33,14 @@ const LoginPage = () => {
 
             // Needs for SSO 
             const amazonReturnURI = queryParams.get('amazonReturnURI'); // intermediary consent page
+            const finalAmazonRedirectURI = queryParams.get('finalAmazonRedirectURI'); // Standalone or NGS
     
-            const thirdPartyState = '3pstate';
+            const thirdPartyStateValue = '3pstate';
             const thirdPartyReturnURI = encodeURIComponent(`https://${window.location.host}/landing`); // 3p landing page
+            const combinedThirdPartyState = encodeURIComponent(`${thirdPartyStateValue}${finalAmazonRedirectURI}`);
 
             if (amazonReturnURI) {
-                const redirectUrl = `${amazonReturnURI}&thirdPartyState=${thirdPartyState}&thirdPartyReturnURI=${thirdPartyReturnURI}`;
+                const redirectUrl = `${amazonReturnURI}&thirdPartyState=${combinedThirdPartyState}&thirdPartyReturnURI=${thirdPartyReturnURI}`;
                 console.log("After login redirect URL: " + redirectUrl);
                 
                 window.location.href = redirectUrl
