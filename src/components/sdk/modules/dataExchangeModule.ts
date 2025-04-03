@@ -16,8 +16,8 @@ export class DataExchangeModule implements SdkModule {
   private pendingPromises: Map<
     string,
     {
-      resolve: (value: unknown) => void;
-      reject: (reason?: unknown) => void;
+      resolve: (value: any) => void;
+      reject: (reason?: any) => void;
       timeoutId?: number;
     }
   > = new Map();
@@ -32,9 +32,7 @@ export class DataExchangeModule implements SdkModule {
    * Also implements retry logic with exponential backoff in case of failure or timeout.
    * @param message - The message object to send.
    */
-  public sendMessage(
-    message: AbstractMessage<AbstractPayload>
-  ): Promise<unknown> {
+  public sendMessage(message: AbstractMessage<AbstractPayload>): Promise<any> {
     console.log("Sending message to parent window: ", message);
 
     return new Promise((resolve, reject) => {
@@ -135,8 +133,8 @@ export class DataExchangeModule implements SdkModule {
     func: () => void,
     requestId: string,
     promiseHandlers: {
-      resolve: (value: unknown) => void;
-      reject: (reason?: unknown) => void;
+      resolve: (value: any) => void;
+      reject: (reason?: any) => void;
     },
     maxRetries: number = 3
   ) {
