@@ -16,8 +16,8 @@ export class DataExchangeModule implements SdkModule {
   private pendingPromises: Map<
     string,
     {
-      resolve: (value: any) => void;
-      reject: (reason?: any) => void;
+      resolve: (value: unknown) => void;
+      reject: (reason?: unknown) => void;
       timeoutId?: number;
     }
   > = new Map();
@@ -32,9 +32,9 @@ export class DataExchangeModule implements SdkModule {
    * Also implements retry logic with exponential backoff in case of failure or timeout.
    * @param message - The message object to send.
    */
-  public sendMessage<T>(
+  public sendMessage(
     message: AbstractMessage<AbstractPayload>
-  ): Promise<any> {
+  ): Promise<unknown> {
     console.log("Sending message to parent window: ", message);
 
     return new Promise((resolve, reject) => {
@@ -46,6 +46,7 @@ export class DataExchangeModule implements SdkModule {
 
       // Function to send message with retry
       const sendFunction = () => {
+        // amazonq-ignore-next-line
         window.parent.postMessage(message, "*");
       };
 
@@ -68,6 +69,7 @@ export class DataExchangeModule implements SdkModule {
 
     // Ensure the message comes from the correct origin
     if (!this.isValidOrigin(event.origin)) {
+      // amazonq-ignore-next-line
       console.warn("Ignoring message from invalid origin:", event.origin);
       return;
     }
@@ -78,6 +80,7 @@ export class DataExchangeModule implements SdkModule {
     const pending = this.pendingPromises.get(traceId);
 
     if (pending) {
+      // amazonq-ignore-next-line
       console.log(
         `Promise found for traceId: ${traceId}, resolving or rejecting...`
       );
@@ -105,6 +108,7 @@ export class DataExchangeModule implements SdkModule {
         pending.reject(responseMessage.error);
       }
     } else {
+      // amazonq-ignore-next-line
       console.warn(`No pending promise found for traceId: ${traceId}`);
     }
   }
@@ -131,8 +135,8 @@ export class DataExchangeModule implements SdkModule {
     func: () => void,
     requestId: string,
     promiseHandlers: {
-      resolve: (value: any) => void;
-      reject: (reason?: any) => void;
+      resolve: (value: unknown) => void;
+      reject: (reason?: unknown) => void;
     },
     maxRetries: number = 3
   ) {

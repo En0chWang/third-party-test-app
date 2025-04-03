@@ -1,6 +1,5 @@
 import { MessageType } from '../types/messageType';
 import { AbstractPayload } from '../payloads/abstractPayload';
-import { Version } from "../types/version";
 
 /**
  * Abstract Message class used for implementing various message types

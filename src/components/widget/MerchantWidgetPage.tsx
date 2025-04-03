@@ -1,75 +1,62 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { Container, Row, Col, Table, Spinner } from "react-bootstrap";
-import { fetchAuthSession, getCurrentUser } from "aws-amplify/auth";
-import { get } from "aws-amplify/api";
+import { Container, Row, Col, Spinner, Card } from "react-bootstrap";
 import { EmbeddedAppSDK } from "../sdk/embeddedAppSDK";
 import { Metrics } from "../sdk/models/structure/metrics";
 import {
   MetricNameConstants,
   MetricType,
 } from "../sdk/models/types/telemetryTypes";
-
-interface MerchantItem {
-  mcid: string;
-  updated_time: number;
-}
-interface ApiData {
-  message: MerchantItem[];
-  error: string;
-}
+import { AuthContext } from "../sdk/models/structure/authContext";
+import { AuthCode } from "../sdk/models/structure/authCode";
 
 const MerchantWidgetPage: React.FC = () => {
-  const [apiData, setApiData] = useState<ApiData | null>(null);
+  const [authCode, setAuthCode] = useState<AuthCode | null>(null);
+  const [authContext, setAuthContext] = useState<AuthContext | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const location = useLocation();
-
   useEffect(() => {
-    const getMerchants = async () => {
-      // const session = await fetchAuthSession();
-      // const token = session.tokens?.idToken?.toString() ?? '';
+    const getAuthData = async () => {
+      try {
+        // Get the singleton instance of the Embedded App SDK
+        const embeddedAppSDK: EmbeddedAppSDK = EmbeddedAppSDK.getInstance();
 
-      // const currentUser = await getCurrentUser();
-      // const user_id = currentUser.userId;
+        // Initialize the SDK once
+        await embeddedAppSDK.initialize();
+        console.log("[3P] Embedded App SDK initialized successfully");
 
-      const embeddedAppSDK: EmbeddedAppSDK = EmbeddedAppSDK.getInstance();
+        // Retrieve both auth context and auth code concurrently
+        const [context, code] = await Promise.all([
+          embeddedAppSDK.authorizationModule.getAuthContext({}),
+          embeddedAppSDK.authorizationModule.getAuthCode(),
+        ]);
 
-      // Initialize the Embedded App SDK
-      embeddedAppSDK
-        .initialize()
-        .then(() => {
-          console.log("[3P] Embedded App SDK initialized successfully");
-          embeddedAppSDK.authorizationModule
-            .getAuthContext({})
-            .then((authContext) => {
-              console.log("[3P] Auth Context:", authContext);
-              const user_auth_code = authContext?.USER_AUTH_CODE;
-              const sc_context_token = authContext?.SC_CONTEXT_TOKEN;
-              console.log("[3P] User auth code:", user_auth_code);
-              console.log("[3P] SC context token:", sc_context_token);
-            });
+        console.log("[3P] Auth Context:", context);
+        console.log("[3P] Auth Code:", code);
 
-          // Capture custom metrics and logs
-          const metricsToRecord: Metrics = {
-            metricName: MetricNameConstants.WIDGET_LOAD,
-            metricsType: MetricType.SUCCESS,
-            timestamp: 123456789,
-            value: 1,
-            isRetryable: true,
-          };
-          embeddedAppSDK.telemetryModule.captureMetrics(metricsToRecord);
-        })
-        .catch((error) => {
-          console.error(
-            "[3P] Error during Embedded App SDK initialization:",
-            error
-          );
-        });
+        setAuthContext(context ?? null);
+        setAuthCode(code ?? null);
+
+        // Capture custom metrics and logs
+        const metricsToRecord: Metrics = {
+          metricName: MetricNameConstants.WIDGET_LOAD,
+          metricsType: MetricType.SUCCESS,
+          timestamp: Date.now(),
+          value: 1,
+          isRetryable: true,
+        };
+        embeddedAppSDK.telemetryModule.captureMetrics(metricsToRecord);
+      } catch (error) {
+        console.error(
+          "[3P] Error during SDK initialization or data retrieval:",
+          error
+        );
+      } finally {
+        setLoading(false);
+      }
     };
 
-    getMerchants();
-  }, [location]);
+    getAuthData();
+  }, []);
 
   return (
     <Container className="justify-content-center align-items-center">
@@ -78,35 +65,35 @@ const MerchantWidgetPage: React.FC = () => {
           <h1 className="text-center">Amazon Merchant Management Widget</h1>
         </Col>
       </Row>
-      <Row className="mt-5">
+      <Row className="mt-3">
         <Col className="d-flex justify-content-center align-items-center">
-          {loading && (
+          {loading ? (
             <Spinner animation="border" role="status">
               <span className="visually-hidden">Loading...</span>
             </Spinner>
-          )}
-        </Col>
-      </Row>
-
-      <Row className="mt-5">
-        <Col>
-          {apiData && apiData.message.length > 0 && (
-            <Table responsive bordered className="text-center">
-              <thead>
-                <tr>
-                  <th>Amazon Merchant ID</th>
-                  <th>Last Updated</th>
-                </tr>
-              </thead>
-              <tbody>
-                {apiData.message.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.mcid}</td>
-                    <td>{new Date(item.updated_time).toLocaleDateString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
+          ) : (
+            <div>
+              <Card className="mb-3">
+                <Card.Body>
+                  <Card.Title>Auth Code</Card.Title>
+                  <Card.Text>
+                    {authCode
+                      ? JSON.stringify(authCode, null, 2)
+                      : "No Auth Code available"}
+                  </Card.Text>
+                </Card.Body>
+              </Card>
+              <Card>
+                <Card.Body>
+                  <Card.Title>Auth Context</Card.Title>
+                  <Card.Text>
+                    {authContext
+                      ? JSON.stringify(authContext, null, 2)
+                      : "No Auth Context available"}
+                  </Card.Text>
+                </Card.Body>
+              </Card>
+            </div>
           )}
         </Col>
       </Row>

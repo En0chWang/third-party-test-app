@@ -6,7 +6,7 @@ import { AuthContext } from "../models/structure/authContext";
 import { AuthRequestPayload } from "../models/payloads/authRequestPayload";
 import { Version } from "../models/types/version";
 import { AuthRequestMessage } from "../models/messages/authRequestMessage";
-import { AuthResponseMessage } from "@amzn/seller-central-embedded-app-sdk-models";
+import { AuthResponseMessage } from "../models/messages/authResponseMessage";
 import { AuthContextRequestPayload } from "../models/payloads/authContextRequestPayload";
 import { AuthContextRequestMessage } from "../models/messages/authContextRequestMessage";
 import { AuthContextResponseMessage } from "../models/messages/authContextResponseMessage";

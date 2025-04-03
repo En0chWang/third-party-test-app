@@ -1,7 +1,6 @@
 import { AbstractMessage} from "./abstractMessage";
 import { AbstractPayload} from "../payloads/abstractPayload";
 import { Version } from "../types/version";
-import {Utils} from "../../utils/utils";
 
 /**
  * Abstracts class used for implementing various request message types
