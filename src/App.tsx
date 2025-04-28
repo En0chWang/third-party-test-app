@@ -1,30 +1,31 @@
-import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { Hub } from 'aws-amplify/utils';
+import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Hub } from "aws-amplify/utils";
 
-import './App.css';
-import 'bootstrap/dist/css/bootstrap.min.css'
-import '@aws-amplify/ui-react/styles.css';
+import "./App.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "@aws-amplify/ui-react/styles.css";
 
-import SiteNav from './components/common/SiteNav';
-import LandingPage from './components/landing/LandingPage';
-import LoginPage from './components/auth/LoginPage';
-import RegisterPage from './components/auth/RegisterPage';
-import MerchantWidgetPage from './components/widget/MerchantWidgetPage';
-import { AuthUser, getCurrentUser } from 'aws-amplify/auth';
-import LWAPage from './components/lwa/LWAPage';
+import SiteNav from "./components/common/SiteNav";
+import LandingPage from "./components/landing/LandingPage";
+import LoginPage from "./components/auth/LoginPage";
+import RegisterPage from "./components/auth/RegisterPage";
+import MerchantWidgetPage from "./components/widget/MerchantWidgetPage";
+import { AuthUser, getCurrentUser } from "aws-amplify/auth";
+import LWAPage from "./components/lwa/LWAPage";
+import PenTestPage from "./components/testing/PenTestPage";
 
 function App() {
   const [user, setUser] = useState<AuthUser | null>(null);
-  
+
   useEffect(() => {
-    Hub.listen('auth', (event) => {
+    Hub.listen("auth", (event) => {
       const eventType = event.payload.event;
-      if (eventType === 'signedOut' || eventType === 'signedIn') {
+      if (eventType === "signedOut" || eventType === "signedIn") {
         updateUser();
       }
-    })
-  }, [])
+    });
+  }, []);
 
   const updateUser = async () => {
     try {
@@ -33,23 +34,24 @@ function App() {
     } catch (err) {
       setUser(null);
     }
-  }
+  };
 
   useEffect(() => {
     updateUser();
-  }, [])
+  }, []);
 
   return (
     <Router>
       <div>
         <SiteNav user={user} />
         <Routes>
-          <Route path='*' element={<LandingPage user={user}/>} />
-          <Route path='/landing' element={<LandingPage user={user}/>} />
-          <Route path='/lwa' element={<LWAPage user={user}/>} />
-          <Route path='/merchants' element={<MerchantWidgetPage />} />
-          <Route path='/login' element={<LoginPage />} />
-          <Route path='/register' element={<RegisterPage />} />
+          <Route path="*" element={<LandingPage user={user} />} />
+          <Route path="/landing" element={<LandingPage user={user} />} />
+          <Route path="/lwa" element={<LWAPage user={user} />} />
+          <Route path="/merchants" element={<MerchantWidgetPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/testing" element={<PenTestPage />} />
         </Routes>
       </div>
     </Router>
