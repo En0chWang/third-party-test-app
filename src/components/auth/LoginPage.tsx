@@ -50,8 +50,13 @@ const LoginPage = () => {
         console.log("After login redirect URL: " + redirectUrl);
 
         window.location.href = redirectUrl;
-      } else if (amazon_callback_uri && amazon_state) {
-        const redirectUrl = `${amazon_callback_uri}?redirect_uri=${thirdPartyReturnURI}&amazon_state=${amazon_state}&state=3pstate`;
+      } else if (amazon_callback_uri) {
+        let redirectUrl;
+        if (amazon_state) {
+          redirectUrl = `${amazon_callback_uri}?redirect_uri=${thirdPartyReturnURI}&amazon_state=${amazon_state}&state=3pstate`;
+        } else {
+          redirectUrl = amazon_callback_uri;
+        }
 
         console.log("After login redirect URL: " + redirectUrl);
 
