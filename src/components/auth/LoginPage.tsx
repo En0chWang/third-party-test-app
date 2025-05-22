@@ -55,7 +55,7 @@ const LoginPage = () => {
         if (amazon_state) {
           redirectUrl = `${amazon_callback_uri}?redirect_uri=${thirdPartyReturnURI}&amazon_state=${amazon_state}&state=3pstate`;
         } else {
-          redirectUrl = amazon_callback_uri;
+          redirectUrl = `${amazon_callback_uri}&state=3pstate`;
         }
 
         console.log("After login redirect URL: " + redirectUrl);
