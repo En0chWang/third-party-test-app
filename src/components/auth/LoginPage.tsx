@@ -45,12 +45,20 @@ const LoginPage = () => {
         `${thirdPartyStateValue}${finalAmazonRedirectURI}`
       );
 
-      if (amazonReturnURI) {
+      if (
+        amazonReturnURI &&
+        (new URL(amazonReturnURI).protocol === "https:" ||
+          new URL(amazonReturnURI).protocol === "http:")
+      ) {
         const redirectUrl = `${amazonReturnURI}&thirdPartyState=${combinedThirdPartyState}&thirdPartyReturnURI=${thirdPartyReturnURI}`;
         console.log("After login redirect URL: " + redirectUrl);
 
         window.location.href = redirectUrl;
-      } else if (amazon_callback_uri) {
+      } else if (
+        amazon_callback_uri &&
+        (new URL(amazon_callback_uri).protocol === "https:" ||
+          new URL(amazon_callback_uri).protocol === "http:")
+      ) {
         let redirectUrl;
         if (amazon_state) {
           redirectUrl = `${amazon_callback_uri}?redirect_uri=${thirdPartyReturnURI}&amazon_state=${amazon_state}&state=3pstate`;
