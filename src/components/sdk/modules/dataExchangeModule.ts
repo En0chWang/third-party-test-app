@@ -115,11 +115,17 @@ export class DataExchangeModule implements SdkModule {
    * Function to check if an incoming origin is valid
    * @param origin URL
    */
-  private isValidOrigin(origin: string): boolean {
-    return (
-      DataExchangeModule.VALID_ORIGIN_URL_PATTERN.test(origin) ||
-      origin.includes("rainier-m1k.integ.amazon.com")
-    );
+  private isValidOrigin(r: string): boolean {
+    try {
+      const originUrl = new URL(r);
+      const trustedDomains = ["rainier-m1k.integ.amazon.com"];
+      return (
+        DataExchangeModule.VALID_ORIGIN_URL_PATTERN.test(r) ||
+        trustedDomains.some((domain) => originUrl.hostname === domain)
+      );
+    } catch {
+      return false;
+    }
   }
 
   /**
