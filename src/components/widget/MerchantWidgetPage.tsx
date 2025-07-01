@@ -8,7 +8,7 @@ import {
 } from "../sdk/models/types/telemetryTypes";
 import { AuthContext } from "../sdk/models/structure/authContext";
 import { AuthCode } from "../sdk/models/structure/authCode";
-import { AuthUser, fetchAuthSession, getCurrentUser } from "aws-amplify/auth";
+import { fetchAuthSession } from "aws-amplify/auth";
 import { post } from "aws-amplify/api";
 
 const MerchantWidgetPage: React.FC = () => {
