@@ -1,5 +1,5 @@
 import type { APIGatewayProxyHandler } from "aws-lambda";
-import AWS, { S3 } from "aws-sdk";
+import AWS from "aws-sdk";
 import axios from "axios";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import {
@@ -49,11 +49,11 @@ const handleAuthCode = async (
   code_verifier: string
 ) => {
   try {
-    // const certs = await s3
-    // .getObject({ Bucket: "amplify-lambda-file-bucket", Key: "ca-certs.json" })
-    // .promise();
-    // const cas_string = certs.Body?.toString("utf-8");
-    // const cas = JSON.parse(cas_string ?? "").cacerts;
+    const certs = await s3
+      .getObject({ Bucket: "amplify-lambda-file-bucket", Key: "ca-certs.json" })
+      .promise();
+    const cas_string = certs.Body?.toString("utf-8");
+    const cas = JSON.parse(cas_string ?? "").cacerts;
 
     const client_creds = await s3
       .getObject({
@@ -65,11 +65,11 @@ const handleAuthCode = async (
       client_creds.Body?.toString("utf-8") ?? ""
     );
 
-    // const agent = new https.Agent({
-    //     ca: cas
-    // });
+    const agent = new https.Agent({
+      ca: cas,
+    });
     const instance = axios.create({
-      // httpsAgent: agent
+      httpsAgent: agent,
     });
     // Call LWA to exchange Auth Code for refresh token
     console.log("Calling LWA beta");
