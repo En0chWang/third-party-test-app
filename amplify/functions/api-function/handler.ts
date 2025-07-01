@@ -7,6 +7,7 @@ import {
   PutCommand,
   QueryCommand,
 } from "@aws-sdk/lib-dynamodb";
+import https from "https";
 
 const s3 = new AWS.S3();
 const client = new DynamoDBClient({ region: "us-east-1" }); // Change to your region
