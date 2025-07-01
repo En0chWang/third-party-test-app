@@ -45,7 +45,8 @@ const getMerchants = async (user_id: string) => {
 const handleAuthCode = async (
   user_id: string,
   mcid: string,
-  spapi_oauth_code: string
+  spapi_oauth_code: string,
+  code_verifier: string
 ) => {
   try {
     // const certs = await s3
@@ -79,6 +80,7 @@ const handleAuthCode = async (
         code: spapi_oauth_code,
         client_id: client_creds_json.client_id,
         client_secret: client_creds_json.client_secret,
+        code_verifier: code_verifier,
       }),
       {
         headers: {
@@ -145,8 +147,14 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       const userId = queryParams["user_id"] ?? "";
       const spapiOauthCode = queryParams["spapi_oauth_code"] ?? "";
       const mcid = queryParams["mcid"] ?? "";
+      const codeVerifier = queryParams["code_verifier"] ?? "";
 
-      const res = await handleAuthCode(userId, mcid, spapiOauthCode);
+      const res = await handleAuthCode(
+        userId,
+        mcid,
+        spapiOauthCode,
+        codeVerifier
+      );
       return res;
     }
 
