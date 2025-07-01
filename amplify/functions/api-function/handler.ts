@@ -1,13 +1,13 @@
 import type { APIGatewayProxyHandler } from "aws-lambda";
-import AWS from "aws-sdk";
+import AWS, { S3 } from "aws-sdk";
 import axios from "axios";
+import { Agent } from "https";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import {
   DynamoDBDocumentClient,
   PutCommand,
   QueryCommand,
 } from "@aws-sdk/lib-dynamodb";
-import https from "https";
 
 const s3 = new AWS.S3();
 const client = new DynamoDBClient({ region: "us-east-1" }); // Change to your region
@@ -66,7 +66,7 @@ const handleAuthCode = async (
       client_creds.Body?.toString("utf-8") ?? ""
     );
 
-    const agent = new https.Agent({
+    const agent = new Agent({
       ca: cas,
     });
     const instance = axios.create({
