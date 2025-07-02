@@ -8,8 +8,6 @@ import {
 } from "../sdk/models/types/telemetryTypes";
 import { AuthContext } from "../sdk/models/structure/authContext";
 import { AuthCode } from "../sdk/models/structure/authCode";
-import { fetchAuthSession } from "aws-amplify/auth";
-import { post } from "aws-amplify/api";
 
 const MerchantWidgetPage: React.FC = () => {
   const [authCode, setAuthCode] = useState<AuthCode | null>(null);
@@ -28,39 +26,9 @@ const MerchantWidgetPage: React.FC = () => {
 
         // Retrieve both auth context and auth code concurrently
         const [context, code] = await Promise.all([
-          embeddedAppSDK.authorizationModule.getAuthContext({
-            pkce: {
-              codeChallenge: "S8_sERwOg1LKsD2u5IHxsbmh0o2w8yBx53PqVGbncr4",
-              codeChallengeMethod: "S256",
-            },
-          }),
-
-          // TODO: to be deprecated
+          embeddedAppSDK.authorizationModule.getAuthContext({}),
           embeddedAppSDK.authorizationModule.getAuthCode(),
         ]);
-
-        const session = await fetchAuthSession();
-        const token = session.tokens?.idToken?.toString() ?? "";
-
-        const userAuthCode = context?.USER_AUTH_CODE || "";
-        const restOperation = post({
-          apiName: "myRestApi",
-          path: "auth-code-path",
-          options: {
-            headers: {
-              Authorization: token,
-            },
-            queryParams: {
-              spapi_oauth_code: userAuthCode,
-              mcid: "test_mcid",
-              user_id: "test_user_id",
-              code_verifier: "jSIYNE4d3f8Km_n0NR9X0MnJC_rGM5ggCxt1YazGzKM",
-            },
-          },
-        });
-        const { body } = await restOperation.response;
-        const str = await body.text();
-        console.log("[3P] Access Token: ", JSON.parse(str));
 
         console.log("[3P] Auth Context:", context);
         console.log("[3P] Auth Code:", code);
