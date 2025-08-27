@@ -27,5 +27,9 @@ export enum MetricNameConstants {
     Not every metric name need to be configured part of this type and primarily is intended
     for key standard metric names that are commonly used across all embedded applications
     */
-    WIDGET_LOAD = "WidgetLoad"
+    WIDGET_LOAD = "WidgetLoad",
+    USER_LINKING = "UserLinking",
+    ACCOUNT_LINKING = "AccountLinking",
+    USER_AND_ACCOUNT_LINKING = "UserAndAccountLinking",
+    NEW_ACCOUNT_LINKED = "NewSellerAccountLinked"
 }

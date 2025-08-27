@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Spinner, Card } from "react-bootstrap";
+import { Container, Row, Col, Spinner, Card, Button } from "react-bootstrap";
 import { EmbeddedAppSDK } from "../sdk/embeddedAppSDK";
 import { Metrics } from "../sdk/models/structure/metrics";
 import {
@@ -7,12 +7,23 @@ import {
   MetricType,
 } from "../sdk/models/types/telemetryTypes";
 import { AuthContext } from "../sdk/models/structure/authContext";
-import { AuthCode } from "../sdk/models/structure/authCode";
 
 const MerchantWidgetPage: React.FC = () => {
-  const [authCode, setAuthCode] = useState<AuthCode | null>(null);
   const [authContext, setAuthContext] = useState<AuthContext | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const handleErrorMetric = (metricName: MetricNameConstants) => {
+    const embeddedAppSDK = EmbeddedAppSDK.getInstance();
+    const errorMetrics: Metrics = {
+      metricName: metricName,
+      metricsType: MetricType.ERROR,
+      timestamp: Date.now(),
+      value: 1,
+      isRetryable: true,
+    };
+    console.log("Generating SDK Error Metric: " + metricName);
+    embeddedAppSDK.telemetryModule.captureMetrics(errorMetrics);
+  };
 
   useEffect(() => {
     const getAuthData = async () => {
@@ -25,16 +36,13 @@ const MerchantWidgetPage: React.FC = () => {
         console.log("[3P] Embedded App SDK initialized successfully");
 
         // Retrieve both auth context and auth code concurrently
-        const [context, code] = await Promise.all([
-          embeddedAppSDK.authorizationModule.getAuthContext({}),
-          embeddedAppSDK.authorizationModule.getAuthCode(),
+        const [context] = await Promise.all([
+          embeddedAppSDK.authorizationModule.getAuthContext({})
         ]);
 
         console.log("[3P] Auth Context:", context);
-        console.log("[3P] Auth Code:", code);
 
         setAuthContext(context ?? null);
-        setAuthCode(code ?? null);
 
         // Capture custom metrics and logs
         const metricsToRecord: Metrics = {
@@ -73,16 +81,6 @@ const MerchantWidgetPage: React.FC = () => {
             </Spinner>
           ) : (
             <div>
-              <Card className="mb-3">
-                <Card.Body>
-                  <Card.Title>Auth Code</Card.Title>
-                  <Card.Text>
-                    {authCode
-                      ? JSON.stringify(authCode, null, 2)
-                      : "No Auth Code available"}
-                  </Card.Text>
-                </Card.Body>
-              </Card>
               <Card>
                 <Card.Body>
                   <Card.Title>Auth Context</Card.Title>
@@ -93,6 +91,26 @@ const MerchantWidgetPage: React.FC = () => {
                   </Card.Text>
                 </Card.Body>
               </Card>
+              <div className="mb-3 d-flex gap-2">
+                <Button 
+                  variant="danger" 
+                  onClick={() => handleErrorMetric(MetricNameConstants.USER_LINKING)}
+                >
+                  User Linking Error
+                </Button>
+                <Button 
+                  variant="danger" 
+                  onClick={() => handleErrorMetric(MetricNameConstants.ACCOUNT_LINKING)}
+                >
+                  Account Linking Error
+                </Button>
+                <Button 
+                  variant="danger" 
+                  onClick={() => handleErrorMetric(MetricNameConstants.USER_AND_ACCOUNT_LINKING)}
+                >
+                  User and Account Linking Error
+                </Button>
+              </div>
             </div>
           )}
         </Col>
